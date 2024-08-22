@@ -1,7 +1,7 @@
 const Menu = () => {
   return (
-    <div>
-      <a href="/"> Home </a> <a href="/profile"> Profile </a>{" "}
+    <div className="flex gap-3 text-white">
+      <a href="/"> Home </a> <a href="/profile">Profile </a>{" "}
     </div>
   );
 };

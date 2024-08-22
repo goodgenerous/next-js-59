@@ -4,7 +4,7 @@ export default function Home() {
   return (
     <>
       <Layout metaTitle="Home" metaDescription="Welcome to our homepage">
-        <p> This is Content </p>{" "}
+        <p className="text-lg p-4 font-bold"> This is Content </p>{" "}
       </Layout>{" "}
     </>
   );
