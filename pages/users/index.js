@@ -1,10 +1,15 @@
-import Layout from "@/layout";
 import Link from "next/link";
+import dynamic from "next/dynamic";
+
+const LayoutComponent = dynamic(() => import("@/layout"));
 
 const Users = () => {
   return (
     <>
-      <Layout metaTitle="User" metaDescription="Ini merupakan halaman user">
+      <LayoutComponent
+        metaTitle="User"
+        metaDescription="Ini merupakan halaman user"
+      >
         <p className="text-lg p-4 font-bold"> Halaman User </p>{" "}
         <span className="flex items-center">
           <p className="text-lg pl-4 font-bold">
@@ -15,7 +20,7 @@ const Users = () => {
             <Link href="/users/details"> Details User </Link>{" "}
           </button>{" "}
         </span>{" "}
-      </Layout>{" "}
+      </LayoutComponent>{" "}
     </>
   );
 };

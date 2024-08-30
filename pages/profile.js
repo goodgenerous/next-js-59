@@ -1,14 +1,16 @@
-import Layout from "@/layout";
+import dynamic from "next/dynamic";
+
+const LayoutComponent = dynamic(() => import("@/layout"));
 
 export default function Profile() {
   return (
     <>
-      <Layout
+      <LayoutComponent
         metaTitle="Profile"
         metaDescription="Ini merupakan halaman profile"
       >
         <p className="text-lg p-4 font-bold"> Halaman Profile </p>{" "}
-      </Layout>{" "}
+      </LayoutComponent>{" "}
     </>
   );
 }

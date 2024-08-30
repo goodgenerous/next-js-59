@@ -1,5 +1,11 @@
-import Layout from "@/layout";
 import { useEffect } from "react";
+import dynamic from "next/dynamic";
+import Image from "next/image";
+import DummyImage from "@/public/image-1.jpg";
+
+const LayoutComponent = dynamic(() => import("@/layout"), {
+  loading: () => <p> Loading... </p>,
+});
 
 export default function Home() {
   useEffect(() => {
@@ -11,9 +17,19 @@ export default function Home() {
 
   return (
     <>
-      <Layout metaTitle="Home" metaDescription="Ini merupakan halaman Home">
+      <LayoutComponent
+        metaTitle="Home"
+        metaDescription="Ini merupakan halaman Home"
+      >
         <p className="text-lg p-4 font-bold"> Halaman Home </p>{" "}
-      </Layout>{" "}
+        <Image
+          src={DummyImage}
+          width={400}
+          height={400}
+          alt="next-logo"
+          placeholder="blur"
+        />{" "}
+      </LayoutComponent>{" "}
     </>
   );
 }
