@@ -7,6 +7,5 @@ export default async function handler(req, res) {
   } catch (error) {
     console.error(error);
   }
-
   // res.status(200).json({ name: "John Doe" });
 }
