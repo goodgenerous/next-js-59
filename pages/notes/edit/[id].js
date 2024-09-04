@@ -10,36 +10,47 @@ import {
   Input,
   Textarea,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 
 const LayoutComponent = dynamic(() => import("@/layout"));
 
-export default function AddNotes() {
+export default function EditNotes() {
   const router = useRouter();
-  const [notesData, setNotesData] = useState({
-    title: "",
-    description: "",
-  });
+  const { id } = router.query;
+  const [notesData, setNotesData] = useState();
 
   const handleSubmit = async () => {
     try {
-      const response = await fetch("https://service.pace-unv.cloud/api/notes", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(notesData),
-      });
+      const response = await fetch(
+        `https://service.pace-unv.cloud/api/notes/update/${id}`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(notesData),
+        }
+      );
       const result = await response.json();
-      console.log(result);
-      router.push("/notes");
+      if (result) {
+        router.push("/notes");
+      }
     } catch (error) {
       console.log(error);
     }
   };
 
+  useEffect(() => {
+    async function fetchingData() {
+      const res = await fetch(`https://service.pace-unv.cloud/api/notes/${id}`);
+      const listNotes = await res.json();
+      setNotesData(listNotes.data);
+    }
+    fetchingData();
+  }, [id]);
+
   return (
     <LayoutComponent
-      metaTitle="Add Notes"
+      metaTitle="Edit Notes"
       metaDescription="Ini merupakan halaman add notes"
     >
       <Card margin={10}>
@@ -48,12 +59,13 @@ export default function AddNotes() {
             Back{" "}
           </Button>{" "}
           <Heading size="lg" mb={4}>
-            Add Data{" "}
+            Edit Data{" "}
           </Heading>{" "}
           <FormControl mb={4}>
             <FormLabel> Title </FormLabel>{" "}
             <Input
               type="text"
+              value={notesData && notesData.title}
               onChange={(event) =>
                 setNotesData({
                   ...notesData,
@@ -65,6 +77,7 @@ export default function AddNotes() {
           <FormControl>
             <FormLabel> Description </FormLabel>{" "}
             <Textarea
+              value={notesData && notesData.description}
               onChange={(event) =>
                 setNotesData({
                   ...notesData,
@@ -72,7 +85,7 @@ export default function AddNotes() {
                 })
               }
             />{" "}
-            <FormHelperText> Fill with notes description </FormHelperText>{" "}
+            <FormHelperText> Edit the notes description </FormHelperText>{" "}
           </FormControl>{" "}
           <Button colorScheme="blue" mt={4} onClick={() => handleSubmit()}>
             Submit{" "}
