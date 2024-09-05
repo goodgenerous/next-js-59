@@ -9,44 +9,69 @@ import {
   FormHelperText,
   Input,
   Textarea,
+  useToast,
 } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
+import { useMutation } from "@/hooks/useMutation";
 
 const LayoutComponent = dynamic(() => import("@/layout"));
 
 export default function EditNotes() {
   const router = useRouter();
   const { id } = router.query;
-  const [notesData, setNotesData] = useState();
+  const { mutate, isError } = useMutation();
+  const toast = useToast();
 
-  const handleSubmit = async () => {
-    try {
-      const response = await fetch(
-        `https://service.pace-unv.cloud/api/notes/update/${id}`,
-        {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(notesData),
-        }
-      );
-      const result = await response.json();
-      if (result) {
-        router.push("/notes");
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  const [data, setData] = useState();
 
   useEffect(() => {
     async function fetchingData() {
       const res = await fetch(`https://service.pace-unv.cloud/api/notes/${id}`);
       const listNotes = await res.json();
-      setNotesData(listNotes.data);
+      setData(listNotes.data);
     }
     fetchingData();
   }, [id]);
+
+  const handleSubmit = async () => {
+    // try {
+    //   const response = await fetch(
+    //     `https://service.pace-unv.cloud/api/notes/update/${id}`,
+    //     {
+    //       method: "PATCH",
+    //       headers: { "Content-Type": "application/json" },
+    //       body: JSON.stringify(notesData),
+    //     }
+    //   );
+    //   const result = await response.json();
+    //   if (result) {
+    //     router.push("/notes");
+    //   }
+    // } catch (error) {
+    //   console.log(error);
+    // }
+    try {
+      const response = await mutate({
+        url: `https://service.pace-unv.cloud/api/notes/update/${id}`,
+        method: "PATCH",
+        payload: data,
+      });
+      console.log("response =>", response);
+      if (!isError) {
+        toast({
+          title: "Data Success Edited",
+          position: "top",
+          variant: "top-accent",
+          status: "success",
+          isClosable: true,
+        });
+      }
+      router.push("/notes");
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <LayoutComponent
@@ -65,10 +90,10 @@ export default function EditNotes() {
             <FormLabel> Title </FormLabel>{" "}
             <Input
               type="text"
-              value={notesData && notesData.title}
+              value={data && data.title}
               onChange={(event) =>
-                setNotesData({
-                  ...notesData,
+                setData({
+                  ...data,
                   title: event.target.value,
                 })
               }
@@ -77,10 +102,10 @@ export default function EditNotes() {
           <FormControl>
             <FormLabel> Description </FormLabel>{" "}
             <Textarea
-              value={notesData && notesData.description}
+              value={data && data.description}
               onChange={(event) =>
-                setNotesData({
-                  ...notesData,
+                setData({
+                  ...data,
                   description: event.target.value,
                 })
               }
