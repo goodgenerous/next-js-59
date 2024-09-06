@@ -13,20 +13,22 @@ import {
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { useRouter } from "next/router";
-import { useMutation } from "@/hooks/useMutation";
+import { mutate } from "swr";
+// import { useMutation } from "@/hooks/useMutation";
 
 const LayoutComponent = dynamic(() => import("@/layout"));
 
 export default function AddNotes() {
-  const { mutate, isError } = useMutation();
   const toast = useToast();
   const router = useRouter();
   const [notesData, setNotesData] = useState({
     title: "",
     description: "",
   });
+  // const { mutate, isError } = useMutation();
 
   const handleSubmit = async () => {
+    // Tanpa menggunakan hooks
     // try {
     //   const response = await fetch("https://service.pace-unv.cloud/api/notes", {
     //     method: "POST",
@@ -39,21 +41,50 @@ export default function AddNotes() {
     // } catch (error) {
     //   console.log(error);
     // }
+    // Menggunakan Custom Hooks
+    //   try {
+    //     const response = await mutate({
+    //       url: "https://service.pace-unv.cloud/api/notes",
+    //       payload: notesData,
+    //     });
+    //     console.log("response =>", response);
+    //     if (!isError) {
+    //       toast({
+    //         title: "Data Success Added",
+    //         position: "top",
+    //         variant: "top-accent",
+    //         status: "success",
+    //         isClosable: true,
+    //       });
+    //     }
+    //     router.push("/notes");
+    //   } catch (error) {
+    //     console.log(error);
+    //   }
+    // };
+    // Menggunakan hooks dari SWR
     try {
-      const response = await mutate({
-        url: "https://service.pace-unv.cloud/api/notes",
-        payload: notesData,
+      const url = `https://service.pace-unv.cloud/api/notes`;
+      const response = await mutate(
+        url,
+        async () => {
+          const result = await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(notesData),
+          });
+          if (!result.ok) return result.json();
+        },
+        { revalidate: true }
+      );
+      console.log(response);
+      toast({
+        title: "Data Success Added",
+        position: "top",
+        variant: "top-accent",
+        status: "success",
+        isClosable: true,
       });
-      console.log("response =>", response);
-      if (!isError) {
-        toast({
-          title: "Data Success Added",
-          position: "top",
-          variant: "top-accent",
-          status: "success",
-          isClosable: true,
-        });
-      }
       router.push("/notes");
     } catch (error) {
       console.log(error);

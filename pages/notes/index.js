@@ -15,22 +15,28 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
-import { useQueries } from "@/hooks/useQueries";
-import { useMutation } from "@/hooks/useMutation";
+import useSWR, { mutate } from "swr";
+import fetcher from "@/utils/fetcher";
+// import { useQueries } from "@/hooks/useQueries";
+// import { useMutation } from "@/hooks/useMutation";
 
 const LayoutComponent = dynamic(() => import("@/layout"));
 
 export default function Notes() {
   const toast = useToast();
-  const { mutate, isError } = useMutation();
-  const { data, isLoading } = useQueries({
-    prefixUrl: "https://service.pace-unv.cloud/api/notes",
-  });
-  console.log("data hooks =>", data);
-  console.log("data hooks loading =>", isLoading);
+  const { data, isLoading } = useSWR(
+    "https://service.pace-unv.cloud/api/notes",
+    fetcher,
+    { revalidateOnFocus: true }
+  );
   const router = useRouter();
+  // const { mutate, isError } = useMutation();
+  // const { data, isLoading } = useQueries({
+  //   prefixUrl: "https://service.pace-unv.cloud/api/notes",
+  // });
 
   const handleDelete = async (id) => {
+    // Tanpa menggunakan hooks
     // try {
     //   const response = await fetch(
     //     `https://service.pace-unv.cloud/api/notes/delete/${id}`,
@@ -45,26 +51,53 @@ export default function Notes() {
     // } catch (error) {
     //   console.log(error);
     // }
+    // Menggunakan custom hooks
+    // try {
+    //   const response = await mutate({
+    //     url: `https://service.pace-unv.cloud/api/notes/delete/${id}`,
+    //     method: "DELETE",
+    //   });
+    //   if (!isError) {
+    //     toast({
+    //       title: "Data Success Deleted",
+    //       position: "top",
+    //       variant: "top-accent",
+    //       status: "warning",
+    //       isClosable: true,
+    //     });
+    //   }
+    //   router.reload();
+    // } catch (err) {
+    //   console.log(err);
+    // }
+    // Menggunakan hooks dari SWR
     try {
-      const response = await mutate({
-        url: `https://service.pace-unv.cloud/api/notes/delete/${id}`,
-        method: "DELETE",
+      const url = `https://service.pace-unv.cloud/api/notes/delete/${id}`;
+      const response = await mutate(
+        url,
+        async () => {
+          const result = await fetch(url, {
+            method: "DELETE",
+          });
+          if (!result.ok) return result.json();
+        },
+        { refreshInterval: 1000 }
+      );
+      console.log(response);
+      toast({
+        title: "Data Success Deleted",
+        position: "top",
+        variant: "top-accent",
+        status: "warning",
+        isClosable: true,
       });
-      if (!isError) {
-        toast({
-          title: "Data Success Deleted",
-          position: "top",
-          variant: "top-accent",
-          status: "warning",
-          isClosable: true,
-        });
-      }
       router.reload();
     } catch (error) {
       console.log(error);
     }
   };
 
+  // Menggunakan useEffect untuk fetching data
   // const [notesData, setNotesData] = useState();
   // useEffect(() => {
   //   async function fetchingData() {
@@ -74,7 +107,6 @@ export default function Notes() {
   //   }
   //   fetchingData();
   // }, []);
-
   // console.log("List Notes => ", notesData);
 
   return (

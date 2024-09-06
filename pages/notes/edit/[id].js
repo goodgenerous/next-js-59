@@ -13,17 +13,17 @@ import {
 } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import { useMutation } from "@/hooks/useMutation";
+import { mutate } from "swr";
+// import { useMutation } from "@/hooks/useMutation";
 
 const LayoutComponent = dynamic(() => import("@/layout"));
 
 export default function EditNotes() {
   const router = useRouter();
   const { id } = router.query;
-  const { mutate, isError } = useMutation();
   const toast = useToast();
-
   const [data, setData] = useState();
+  // const { mutate, isError } = useMutation();
 
   useEffect(() => {
     async function fetchingData() {
@@ -35,6 +35,7 @@ export default function EditNotes() {
   }, [id]);
 
   const handleSubmit = async () => {
+    // Tanpa menggunakan hooks
     // try {
     //   const response = await fetch(
     //     `https://service.pace-unv.cloud/api/notes/update/${id}`,
@@ -51,22 +52,50 @@ export default function EditNotes() {
     // } catch (error) {
     //   console.log(error);
     // }
+    // Menggunakan Custom Hooks
+    // try {
+    //   const response = await mutate({
+    //     url: `https://service.pace-unv.cloud/api/notes/update/${id}`,
+    //     method: "PATCH",
+    //     payload: data,
+    //   });
+    //   console.log("response =>", response);
+    //   if (!isError) {
+    //     toast({
+    //       title: "Data Success Edited",
+    //       position: "top",
+    //       variant: "top-accent",
+    //       status: "success",
+    //       isClosable: true,
+    //     });
+    //   }
+    //   router.push("/notes");
+    // } catch (error) {
+    //   console.log(error);
+    // }
+    // Menggunakan hooks dari SWR
     try {
-      const response = await mutate({
-        url: `https://service.pace-unv.cloud/api/notes/update/${id}`,
-        method: "PATCH",
-        payload: data,
+      const url = `https://service.pace-unv.cloud/api/notes/update/${id}`;
+      const response = await mutate(
+        url,
+        async () => {
+          const result = await fetch(url, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+          });
+          if (!result.ok) return result.json();
+        },
+        { revalidate: true }
+      );
+      console.log(response);
+      toast({
+        title: "Data Success Edited",
+        position: "top",
+        variant: "top-accent",
+        status: "success",
+        isClosable: true,
       });
-      console.log("response =>", response);
-      if (!isError) {
-        toast({
-          title: "Data Success Edited",
-          position: "top",
-          variant: "top-accent",
-          status: "success",
-          isClosable: true,
-        });
-      }
       router.push("/notes");
     } catch (error) {
       console.log(error);
