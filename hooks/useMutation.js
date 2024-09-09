@@ -8,12 +8,15 @@ export const useMutation = () => {
   });
 
   const mutate = useCallback(
-    async ({ url = "", method = "POST", payload = {} } = {}) => {
+    async ({ url = "", method = "POST", payload = {}, headers = {} } = {}) => {
       try {
         const response = await fetch(url, {
           method,
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
+          headers: {
+            "Content-Type": "application/json",
+            ...headers,
+          },
+          ...(method !== "GET" && { body: JSON.stringify(payload) }),
         });
         const result = await response.json();
         setData({
@@ -31,7 +34,7 @@ export const useMutation = () => {
         return error;
       }
     },
-    []
+    [data]
   );
 
   return { ...data, mutate };

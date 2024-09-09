@@ -5,6 +5,7 @@ import DummyImage from "@/public/image-1.jpg";
 
 const LayoutComponent = dynamic(() => import("@/layout"), {
   loading: () => <p> Loading... </p>,
+  ssr: false,
 });
 
 export default function Home() {
