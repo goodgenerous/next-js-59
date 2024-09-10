@@ -4,17 +4,15 @@ import { Text } from "@chakra-ui/react";
 import Cookies from "js-cookie";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useContext } from "react";
+import { UserContext } from "@/context/userContext";
 
 const Menu = () => {
-  const API_URL = process.env.NEXT_PUBLIC_URL_API;
+  const userData = useContext(UserContext);
   const router = useRouter();
   const { mutate } = useMutation();
-  const { data } = useQueries({
-    prefixUrl: `${API_URL}/user/me`,
-    headers: {
-      Authorization: `Bearer ${Cookies.get("user_token")}`,
-    },
-  });
+  console.log("userdata =>", userData);
+  const API_URL = process.env.NEXT_PUBLIC_URL_API;
 
   const handleLogout = async () => {
     const response = await mutate({
@@ -51,7 +49,7 @@ const Menu = () => {
         {" "}
         <Text className="bg-green-400 px-2 rounded-lg">
           {" "}
-          Hello {data && data.data.name}{" "}
+          Hello {userData && userData.name}{" "}
         </Text>{" "}
         {!Cookies.get("user_token") ? (
           <Link href="/login" className="hover:font-bold">

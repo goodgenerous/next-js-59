@@ -1,6 +1,9 @@
 import dynamic from "next/dynamic";
 
-const LayoutComponent = dynamic(() => import("@/layout"));
+const LayoutComponent = dynamic(() => import("@/layout"), {
+  loading: () => <p> Loading... </p>,
+  ssr: false,
+});
 
 export default function Posts({ posts }) {
   console.log("data posts => ", posts);

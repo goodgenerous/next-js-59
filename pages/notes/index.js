@@ -20,7 +20,10 @@ import fetcher from "@/utils/fetcher";
 // import { useQueries } from "@/hooks/useQueries";
 // import { useMutation } from "@/hooks/useMutation";
 
-const LayoutComponent = dynamic(() => import("@/layout"));
+const LayoutComponent = dynamic(() => import("@/layout"), {
+  loading: () => <p> Loading... </p>,
+  ssr: false,
+});
 
 export default function Notes() {
   const toast = useToast();

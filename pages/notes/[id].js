@@ -2,7 +2,10 @@ import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 import { Card, Button, Flex } from "@chakra-ui/react";
 
-const LayoutComponent = dynamic(() => import("@/layout"));
+const LayoutComponent = dynamic(() => import("@/layout"), {
+  loading: () => <p> Loading... </p>,
+  ssr: false,
+});
 
 export default function DetailNotes({ notes }) {
   console.log("Data user => ", notes);

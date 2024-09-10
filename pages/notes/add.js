@@ -16,7 +16,10 @@ import { useRouter } from "next/router";
 import { mutate } from "swr";
 // import { useMutation } from "@/hooks/useMutation";
 
-const LayoutComponent = dynamic(() => import("@/layout"));
+const LayoutComponent = dynamic(() => import("@/layout"), {
+  loading: () => <p> Loading... </p>,
+  ssr: false,
+});
 
 export default function AddNotes() {
   const toast = useToast();

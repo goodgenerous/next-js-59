@@ -9,13 +9,6 @@ const LayoutComponent = dynamic(() => import("@/layout"), {
 });
 
 export default function Home() {
-  useEffect(() => {
-    fetch("/api/hello")
-      .then((res) => res.json())
-      .then((res) => console.log("response => ", res))
-      .catch((err) => console.error("error => ", err));
-  }, []);
-
   return (
     <>
       <LayoutComponent
